@@ -1,0 +1,14 @@
+{
+  "name": "data",
+  "version": "1.0.0",
+  "description": "",
+  "main": "try.js",
+  "scripts": {
+    "start": "node try"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^20.5.0"
+  }
+}
