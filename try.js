@@ -1,26 +1,59 @@
+const fs = require("fs");
 const puppeteer = require("puppeteer");
 async function extractdata()
 {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
-    await page.goto("https://www.flipkart.com/noise-icon-buzz-1-69-display-bluetooth-calling-built-in-games-voice-assistant-smartwatch/p/itmd8257a482e5d5?pid=SMWGAU62XCAESACH&otracker=hp_nativeads_Featured%2BBrands_1_10.nativeAdCard.NATIVEADS_NOISE_YXAV1313N4ZQ");
+    await page.goto("https://www.amazon.in/All-Mobile-Phones/s?k=All+Mobile+Phones");
+ 
+    // await page.screenshot({path: "image.png",fullPage : true});
+    // await page.pdf({path: "site.pdf",format: "A4"}); 
 
-    
-    const title = await page.evaluate(() => document.title);
-    console.log(title);
-    const price = await page.evaluate(() => document.querySelector(".container ._30jeq3._16Jk6d"));
-    console.log(price);
-    // const rating = await page.evaluate(() => rating);
-    // console.log(rating);
-    const text = await page.evaluate(() => document.body.innerText);
-    console.log(text);
+    const productsHandles = await page.$$(".sg-col-inner") ;
+    const products = [];
+    for(const productshandle of productsHandles)
+    {
+        let title = "Null";
+        let price = "Null";
+        let rating = "Null";
+        let numberofRating = "Null";
+        
+        try{
+            title = await page.evaluate((el) => el.querySelector(".s-title-instructions-style > h2").textContent, productshandle);
+           // console.log("Title :",title);
+        }catch(error){}
 
-    const links = await page.evaluate(() => Array.from(document.querySelectorAll('a',(e) => e.href)));
-    console.log(links);
+        try{
+             price = await page.evaluate((el) => el.querySelector(".a-price-whole").textContent, productshandle);
+          //console.log("Price :",price);
+        }catch(error){}
 
+        try{
+             rating = await page.evaluate((el) => el.querySelector(".a-icon.a-icon-star-small.a-star-small-4.aok-align-bottom").textContent, productshandle);
+            //    console.log("Rating :",rating);
+        }catch(error){}
 
-   if(browser) await browser.close();
+        try{
+             numberofRating = await page.evaluate((el) => el.querySelector(".a-section.a-spacing-none.a-spacing-top-micro > div > span:nth-child(2) > a > span").textContent, productshandle);
+                //    console.log("NumberofRating :",numberofRating);
+       
+        }catch(error){}
+        if (title!== "Null"){
+            products.push({title,price,rating,numberofRating});
+         
+
+        }
+        //    Items.push({title,price,rating,numberofRating,discounts});
+        
+    }
+    console.log(products)
+
+    fs.writeFile("products.json",JSON.stringify(products), (err) => {
+        if(err) throw err;
+        console.log("File Saved");
+    })
+  
+    await browser.close();
 }
 
 extractdata();
-
